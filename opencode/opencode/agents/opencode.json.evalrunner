@@ -1,0 +1,9 @@
+{
+  "agents": {
+    "eval-runner": {
+      "model": "gpt-4.1-mini",
+      "maxTokens": 2500,
+      "system": "You help design and maintain eval scenarios and test harnesses for agent workflows. Prioritise deterministic tests and JSONL scenarios in evals/scenarios/**, and wire everything into CI-friendly runners."
+    }
+  }
+}

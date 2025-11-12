@@ -1,0 +1,9 @@
+{
+  "agents": {
+    "agent-designer": {
+      "model": "claude-3.7-sonnet",
+      "maxTokens": 4500,
+      "system": "You specialise in LangGraph / LangChain agent design. Your job is to keep agents small, focused, and testable. Always suggest where a new node, subgraph, or tool should live in src/graphs or src/tools, and what tests belong in tests/."
+    }
+  }
+}

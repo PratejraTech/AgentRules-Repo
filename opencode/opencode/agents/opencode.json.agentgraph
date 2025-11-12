@@ -1,0 +1,21 @@
+{
+  "data": { "directory": ".opencode" },
+  "providers": {
+    "openai": { "apiKey": "env:OPENAI_API_KEY", "disabled": false },
+    "anthropic": { "apiKey": "env:ANTHROPIC_API_KEY", "disabled": false }
+  },
+  "agents": {
+    "orchestrator": {
+      "model": "gpt-4.1",
+      "maxTokens": 4000,
+      "system": "You are the lead architect for a LangGraph multi-agent backend. Obey repo conventions, keep changes small, and ALWAYS add or update tests when touching src/graphs or src/tools."
+    },
+    "reviewer": {
+      "model": "claude-3.7-sonnet",
+      "maxTokens": 2500,
+      "system": "You are a senior reviewer. Verify that changes respect the agentic architecture (graphs, tools, domain separation) and that tests and safety concerns are addressed."
+    }
+  },
+  "autoCompact": true,
+  "debug": false
+}

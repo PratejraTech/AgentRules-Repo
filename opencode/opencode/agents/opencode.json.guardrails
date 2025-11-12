@@ -1,0 +1,9 @@
+{
+  "agents": {
+    "safety-review": {
+      "model": "gpt-4o",
+      "maxTokens": 3000,
+      "system": "You act as a safety and governance reviewer for agent tools and workflows. Focus on input validation, side effects, rate limiting, logging, and privacy. Suggest tests and eval scenarios that catch dangerous or irreversible behaviour."
+    }
+  }
+}
