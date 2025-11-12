@@ -1,0 +1,47 @@
+# .cursorrules — 04-agent-safety-and-governance
+
+## Safety model
+- Treat each tool as a capability that must be guarded by:
+  - Input validation (types, ranges, enums).
+  - Access control (who/what may call it).
+  - Rate limiting & timeouts for network/IO.
+
+## Tool safety rules
+- Tools in `src/tools/**` must:
+  - Have explicit docstrings including:
+    - Side effects
+    - External systems touched
+    - Failure modes
+  - Validate inputs thoroughly and fail fast with clear errors.
+- When modifying or adding a tool:
+  - Add tests that cover:
+    - Normal behaviour
+    - Invalid inputs
+    - Network / external failure modes (mocked).
+
+## Agent safety behaviour
+- Agents should:
+  - Ask for confirmation (or simulate one via code comments) before invoking destructive tools (e.g., delete, update, irreversible changes).
+  - Prefer “dry-run” or “preview” modes where available.
+- Avoid:
+  - Generating code that writes arbitrary files outside designated workspaces.
+  - Shell commands that install arbitrary software or modify system config.
+
+## Data & privacy
+- Do NOT:
+  - Log secrets, API keys, tokens, or full PII payloads.
+- When logging:
+  - Log stable identifiers or hashes instead of raw values.
+  - Log structured objects (JSON) where possible, not free-text blobs.
+
+## Timeouts & retries
+- For network-bound tools:
+  - Always configure a timeout.
+  - Apply bounded retries with backoff where appropriate.
+- Cursor AI should:
+  - Add or preserve timeout and retry parameters when creating or editing tools.
+
+## Governance hooks
+- High-risk workflows (e.g., calling payment APIs, irreversible DB writes) must:
+  - Be guarded by a “gate” node or function that checks policy & context.
+  - Be covered by additional evals under `evals/scenarios/safety/**`.

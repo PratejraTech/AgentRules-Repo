@@ -1,0 +1,55 @@
+# .cursorrules — 03-agent-eval-and-simulation
+
+## Eval philosophy
+- Every critical agent workflow must have:
+  - Automated tests (Python / your language of choice).
+  - Scenario-based evals with realistic inputs and expected behaviour.
+- Evals should be:
+  - Deterministic when possible (LLMs mocked or temperature=0).
+  - Representative of real user journeys, not synthetic toy examples.
+
+## Repo structure for evals
+- `evals/scenarios/**`:
+  - JSONL or YAML scenario files grouped per workflow.
+- `evals/runners/**`:
+  - Scripts or harnesses to run evals locally and in CI.
+- `evals/reports/**`:
+  - Generated output summaries (do not commit large artefacts).
+
+## Cursor behaviour for eval-related changes
+- When adding or modifying:
+  - `src/graphs/**`
+  - `src/agents/**`
+  - `src/tools/**`
+
+  Then:
+  - Propose at least one new scenario or update an existing one in `evals/scenarios/**`.
+  - Add or update tests in `tests/**` to cover the change.
+
+- When asked to “add a new eval”:
+  - Reuse existing scenario schema.
+  - Include:
+    - `input`
+    - `expected_outcome` (textual description)
+    - `eval_type` (e.g., unit, integration, regression, safety)
+    - `tags` (e.g., `["regression", "safety", "happy-path"]`).
+
+## Eval harness expectations
+- Eval runners must:
+  - Be scriptable from CLI (e.g., `python -m evals.runners.<name>`).
+  - Exit with non-zero status on failure to integrate with CI easily.
+- Prefer simple metrics first:
+  - Pass/fail, rule-based checks, string containment.
+  - Only layer in semantic grading when signal is too weak.
+
+## LLM evaluation usage
+- If using an LLM to score outputs:
+  - Keep prompts in versioned files under `evals/prompts/**`.
+  - Avoid self-referential evals (same model generating and grading).
+  - Document which model is used for eval and why.
+
+## Reporting
+- When creating eval scripts:
+  - Output human-readable summary + machine-readable JSON.
+  - Include counts:
+    - total, passed, failed, skipped.

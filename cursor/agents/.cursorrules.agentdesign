@@ -1,0 +1,54 @@
+# .cursorrules — 02-agent-design-and-workflows
+
+## Agent roles & responsibilities
+- Agents represent roles (Planner, Executor, Critic, ToolRouter, etc.), not services.
+- Each agent definition must include:
+  - Clear purpose and scope in docstring.
+  - Inputs/outputs typed with Pydantic models.
+  - Simple, composable behaviour.
+
+## Graph design rules
+- Prefer:
+  - Planner → Executor → Critic pattern for complex tasks.
+  - Smaller subgraphs composed into larger workflows.
+- Graph files:
+  - Add a high-level comment at the top describing:
+    - Goal of the workflow
+    - Entry node(s)
+    - Abort and success conditions
+  - Name nodes after behaviours, not LLMs (e.g., `plan_customer_onboarding`, not `gpt_node_1`).
+
+## Tooling conventions
+- All tools:
+  - Live under `src/tools/**`.
+  - Are side-effect-aware; clearly documented if they mutate external state.
+  - Have an associated test file in `tests/tools/**`.
+- Tools must:
+  - Take and return Pydantic models.
+  - Handle errors explicitly (return structured error info or raise domain errors; do not silently swallow exceptions).
+
+## When Cursor creates / edits agents
+- If adding a new agent:
+  - Define its role and responsibilities in a docstring.
+  - Check for existing agents with overlapping responsibilities and reuse or refactor instead of duplicating.
+- If modifying a graph:
+  - Maintain existing control flow unless explicitly requested to refactor.
+  - Preserve node names and their public contracts when possible; if changed, update all references and tests.
+
+## Agent evaluation hooks
+- For each new workflow:
+  - Provide at least one example scenario in `evals/scenarios/{workflow}.jsonl`.
+  - Use fields like:
+    - `input`, `expected_behaviour`, `notes`, `tags`.
+- Graph nodes that call external systems:
+  - Should be easy to stub/mock.
+  - Must avoid irreversible side effects in dry-run or test modes.
+
+## LLM usage patterns
+- Large tasks:
+  - First have the Planner node create a structured plan (list of steps).
+  - Executor nodes implement the plan step by step.
+  - Critic nodes review outputs and either accept or loop back.
+- Prompting:
+  - Prefer structured, tool-friendly prompts with clear sections (context, task, constraints, output format).
+  - Avoid chatty or vague prompts in the core code paths.

@@ -1,0 +1,53 @@
+# .cursorrules — 05-agent-experiments-and-spikes
+
+## Purpose
+- This repo (or subfolder) is for experiments and spikes around agentic workflows.
+- Goals:
+  - Rapid exploration of ideas.
+  - Clear separation from production code.
+  - Easy promotion path when an experiment matures.
+
+## Folder conventions
+- `sandbox/**`:
+  - Short-lived experiments, PoCs, and notebooks/scripts.
+- `lab/**`:
+  - More stable prototypes that might be promoted later.
+- `promoted/**`:
+  - Experiments that are ready to be ported into production repos.
+
+## Behaviour for experimental code
+- You may:
+  - Relax some style rules to move faster.
+  - Call LLMs directly from nodes for quick prototyping.
+- You must:
+  - Clearly mark experimental code with comments like:
+    - `# EXPERIMENTAL: not for production`
+  - Avoid hard-coding secrets or real endpoints. Use:
+    - Mock URLs
+    - Fake keys
+    - Local dockerised services
+
+## Promotion pathway
+- When an experiment is promising:
+  - Add a short `PROMOTION_NOTES.md` in its folder describing:
+    - What the workflow does.
+    - How it could be integrated into existing graphs/tools.
+    - Risks and unknowns.
+  - Suggest where the code should live in the production repo (`src/graphs`, `src/tools`, `src/domain`, etc.).
+
+## Testing expectations
+- Even experiments should:
+  - Include at least one rough test or script that exercises the main path.
+  - Prefer deterministic checks when easy to do.
+- Before promoting:
+  - Tighten types, remove dead code, and add real tests in a `tests/` folder.
+
+## Cursor-specific guidance
+- In `sandbox/**`:
+  - Optimise for clarity of ideas, not perfect architecture.
+  - Leave clear TODOs for production-grade features (proper error handling, logging, evals).
+- In `lab/**`:
+  - Move closer to production standards:
+    - Pydantic models
+    - Clear node naming
+    - Basic eval scenarios

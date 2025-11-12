@@ -1,0 +1,70 @@
+# .cursorrules — 01-agentic-monorepo-base
+
+## Project context
+- This repo implements multi-agent workflows using:
+  - Python 3.11+
+  - LangGraph for orchestration
+  - LangChain tools where useful
+  - LangSmith or equivalent for tracing & eval
+- Primary goals:
+  - Deterministic, testable agent graphs
+  - Safe, explicit tool use
+  - Clean separation between:
+    - Orchestration (graphs)
+    - Tools / IO
+    - Domain logic
+    - Infra & adapters
+
+## Repository layout
+- `src/graphs/**`  → LangGraph graph definitions & subgraphs
+- `src/agents/**`  → Agent configs / roles, not heavy business logic
+- `src/tools/**`   → Tool implementations (single-responsibility)
+- `src/domain/**`  → Pure domain logic & entities
+- `src/adapters/**`→ Integrations (APIs, DB, queues, etc.)
+- `tests/**`       → Unit & integration tests
+- `evals/**`       → Scenarios, golden traces, and eval harness
+
+When editing, follow existing patterns in these folders before inventing new ones.
+
+## Architectural conventions
+- Do NOT embed business logic directly in agents or graphs.
+  - Implement logic in `src/domain/**` and call it from graphs/tools.
+- Agents orchestrate work; tools and domain functions do the work.
+- Graph files should:
+  - Define nodes and edges clearly.
+  - Keep nodes small and composable.
+  - Expose a single `get_graph()` or similar factory function.
+
+## Coding style
+- Python:
+  - Use type hints everywhere for public functions.
+  - Use Pydantic models (BaseModel) for all tool inputs/outputs.
+  - Assume we run `black` and `ruff`; follow their expectations.
+- Prefer small, pure functions and explicit dependencies.
+
+## Behaviour for Cursor AI
+- Before large refactors or new workflows:
+  - First propose a short plan in comments or in the diff summary.
+  - Then implement step-by-step, keeping changes localized.
+- When adding new code:
+  - Reuse existing helpers, tools, and patterns.
+  - Respect file boundaries: do not mix domain, infra, and orchestration.
+
+## Testing & eval expectations
+- Any change in `src/graphs/**` or `src/tools/**` must:
+  - Include or update tests in `tests/**`.
+  - Add at least one “happy path” and one edge-case/guardrail test.
+- Tests should be:
+  - Fast and deterministic (LLM calls mocked or stubbed).
+  - Focused on graph behaviour and tool contracts.
+
+## Observability
+- All nodes and tools:
+  - Accept and propagate a `trace_id` or similar correlation id.
+  - Log key decisions or branching logic via our logging helpers.
+- Never log secrets or full raw prompts; log high-level summaries only.
+
+## Safety basics
+- No direct network calls from pure domain modules.
+- No secrets or tokens hard-coded in code or tests.
+- Prefer env vars + secret managers; if missing, stop and comment instead of faking values.
